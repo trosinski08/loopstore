@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Skopiuj pozostałe pliki projektu
 COPY . /app
 
-# Inicjalizuj projekt Django, jeśli nie istnieje
-RUN if [ ! -f "manage.py" ]; then python -m django startproject backend .; fi
+# Inicjalizuj pgit rojekt Django, jeśli nie istnieje
+RUN if [ ! -f "manage.py" ]; then python -m django startproject backend_web .; fi
 
 # Uruchom serwer Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
