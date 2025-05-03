@@ -18,6 +18,7 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=255)
     customer_email = models.EmailField()
     address = models.TextField()
+    items = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
