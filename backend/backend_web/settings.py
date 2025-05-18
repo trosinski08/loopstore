@@ -80,15 +80,15 @@ WSGI_APPLICATION = 'backend_web.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'loopstore_db',
-           'USER': 'postgres',
-           'PASSWORD': 'Loops123!',
-           'HOST': 'db',
-           'PORT': '5432',
-       }
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'loopstore_db',
+        'USER': 'postgres',
+        'PASSWORD': 'Loops123!',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 
 
 # Password validation

@@ -18,17 +18,24 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from shop.views import ProductViewSet, home, OrderView
+from shop.views import (
+    ProductViewSet, 
+    CategoryViewSet,
+    ProductSizeViewSet,
+    OrderViewSet,
+    home
+)
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 router = DefaultRouter()
-router.register(r'products', ProductViewSet)
+router.register(r'products', ProductViewSet, basename='product')
+router.register(r'categories', CategoryViewSet, basename='category')
+router.register(r'sizes', ProductSizeViewSet, basename='size')
+router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)), # API dla aplikacji shop
-    path('', home, name='home'),  # Strona główna
-    path('api/orders/', OrderView.as_view(), name='orders'),
+    path('api/', include(router.urls)),
+    path('', home, name='home'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
