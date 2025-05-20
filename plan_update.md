@@ -3,6 +3,7 @@
 ## 1. Narzędzia z GitHub Student Developer Pack
 
 ### Hosting i Deployment
+
 - **DigitalOcean** ($200 kredytu)
   - Kubernetes cluster dla kontenerów
   - Managed Database dla PostgreSQL
@@ -14,6 +15,7 @@
   - Backup i disaster recovery
 
 ### Monitoring i Wydajność
+
 - **DataDog** (2 lata Pro)
   - Monitoring infrastruktury
   - APM (Application Performance Monitoring)
@@ -25,6 +27,7 @@
   - Release tracking
 
 ### Rozwój i Testowanie
+
 - **JetBrains** (pełna subskrypcja)
   - PyCharm Professional dla backendu
   - WebStorm dla frontendu
@@ -36,6 +39,7 @@
   - Documentation help
 
 ### Design i UI/UX
+
 - **Figma** (Professional plan)
   - UI/UX design
   - Component library
@@ -47,6 +51,7 @@
   - Bannery i promocje
 
 ### Bezpieczeństwo
+
 - **Name.com** (darmowa domena .tech)
   - SSL certificate
   - Domain registration
@@ -60,7 +65,8 @@
 ## 2. Architektura Projektu
 
 ### Frontend (Next.js 14)
-```
+
+```bash
 frontend/
 ├── app/
 │   ├── (shop)/
@@ -95,7 +101,8 @@ frontend/
 ```
 
 ### Backend (Django 5.2)
-```
+
+```bash
 backend/
 ├── apps/
 │   ├── products/
@@ -124,6 +131,7 @@ backend/
 ## 3. Konfiguracja Infrastruktury
 
 ### Docker
+
 ```yaml
 # docker-compose.yml
 version: '3.8'
@@ -168,23 +176,27 @@ volumes:
 ## 4. Funkcjonalności i Implementacja
 
 ### System Produktów
+
 - Kategorie i tagi
 - Warianty produktów (rozmiary, kolory)
 - System zarządzania stanem magazynowym
 - Wyszukiwanie i filtrowanie
 
 ### Koszyk i Zamówienia
+
 - Persystentny koszyk (Redis)
 - Proces checkout
 - Śledzenie statusu zamówienia
 - Historia zamówień
 
 ### System Płatności
+
 - Stripe integration
 - PayPal (opcjonalnie)
 - Przelewy24 (dla rynku polskiego)
 
 ### Użytkownicy i Autoryzacja
+
 - Auth0 dla uwierzytelniania
 - Role i uprawnienia
 - Profile użytkowników
@@ -193,6 +205,7 @@ volumes:
 ## 5. Bezpieczeństwo
 
 ### Zabezpieczenia
+
 - HTTPS (SSL/TLS)
 - CORS policy
 - Rate limiting
@@ -201,6 +214,7 @@ volumes:
 - CSRF tokens
 
 ### Monitoring
+
 - DataDog APM
 - Sentry error tracking
 - Custom logging
@@ -209,6 +223,7 @@ volumes:
 ## 6. SEO i Wydajność
 
 ### SEO
+
 - Server-side rendering
 - Meta tagi
 - Sitemap.xml
@@ -216,6 +231,7 @@ volumes:
 - Schema.org markup
 
 ### Optymalizacja
+
 - Code splitting
 - Lazy loading
 - Image optimization
@@ -225,23 +241,27 @@ volumes:
 ## 7. Plan Wdrożenia
 
 ### Etap 1: Setup (Tydzień 1-2)
+
 - Konfiguracja środowiska
 - Podstawowa struktura projektu
 - CI/CD pipeline
 
 ### Etap 2: Core Features (Tydzień 3-6)
+
 - System produktów
 - Koszyk
 - Autoryzacja
 - Podstawowy UI
 
 ### Etap 3: Enhanced Features (Tydzień 7-10)
+
 - System płatności
 - Zaawansowane filtrowanie
 - Profile użytkowników
 - Admin panel
 
 ### Etap 4: Optimization (Tydzień 11-12)
+
 - SEO
 - Performance
 - Security
@@ -249,20 +269,23 @@ volumes:
 
 ## 8. Rozwój i Utrzymanie
 
-### Monitoring
+### Monitoring:/
+
 - DataDog dashboards
 - Error tracking
 - Performance metrics
 - User analytics
 
 ### Backup
+
 - Database backups
 - Media files backup
 - Configuration backup
 - Disaster recovery plan
 
 ### Updates
+
 - Security patches
 - Dependency updates
 - Feature updates
-- Performance improvements 
+- Performance improvements

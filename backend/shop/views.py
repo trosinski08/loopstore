@@ -1,4 +1,5 @@
 # filepath: c:\Users\Tomek\source\loopstore\backend\shop\views.py
+from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
