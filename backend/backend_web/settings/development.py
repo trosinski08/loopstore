@@ -1,19 +1,19 @@
 from .base import *
 import urllib.parse
+import secrets
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-weyhvv4whj*!em(h-k0gv(!+o!4wurak6-%90iw#uwp_t&-=%f'
+# Generate a secure secret key
+SECRET_KEY = secrets.token_urlsafe(50)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# Limit allowed hosts even in development
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
-# Database
-# Parse DATABASE_URL to get password
+# Database configuration with security improvements
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
-    # Example: postgres://postgres:password@db:5432/loopstore
     parsed_url = urllib.parse.urlparse(database_url)
     password = urllib.parse.unquote(parsed_url.password) if parsed_url.password else ''
     username = parsed_url.username or 'postgres'
@@ -35,13 +35,18 @@ DATABASES = {
         'PASSWORD': password,
         'HOST': hostname,
         'PORT': port,
+        'OPTIONS': {
+            'sslmode': 'prefer',
+        },
     }
 }
 
-# CORS settings
+# CORS settings with more restrictive configuration
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:80",
+    "http://127.0.0.1:80",
     "http://localhost",
-    "http://127.0.0.1",
+    "http://127.0.0.1"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -67,4 +72,13 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_EXPOSE_HEADERS = ['content-type', 'content-length']
-CORS_ALLOW_ALL_ORIGINS = True  # Only for development! 
+
+# Security middleware settings
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Replace CORS_ALLOW_ALL_ORIGINS with specific origins
+CORS_ALLOW_ALL_ORIGINS = False  # More secure option 
