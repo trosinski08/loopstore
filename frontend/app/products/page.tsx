@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { Filter, SortAsc, SortDesc } from 'lucide-react';
-import { getMediaUrl } from '@/lib/utils';
+import { getMediaUrl } from '@/src/utils/mediaUrl';
 
 interface Category {
   id: number;
@@ -37,24 +37,34 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState<'price' | 'name'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const { addToCart } = useCart();
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log('Fetching products...');
-        const res = await fetch('/api/products/');
-        console.log('Response status:', res.status);
+        setLoading(true);
+        setError(null);
+        const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api';
+        const res = await fetch(`${baseApiUrl}/products`, {
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
         if (!res.ok) {
           const errorText = await res.text();
           console.error('Error response:', errorText);
           throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
         }
+        
         const data = await res.json();
-        console.log('Products fetched successfully:', data.length);
-        setProducts(data);
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          throw new Error('Invalid data format received from API');
+        }
       } catch (err) {
-        console.error('Detailed error:', err);
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching products:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load products');
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -62,23 +72,31 @@ export default function ProductsPage() {
 
     fetchProducts();
   }, []);
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        console.log('Fetching categories...');
-        const res = await fetch('/api/categories/');
-        console.log('Categories response status:', res.status);
+        const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api';
+        const res = await fetch(`${baseApiUrl}/categories`, {
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
         if (!res.ok) {
           const errorText = await res.text();
           console.error('Categories error response:', errorText);
           throw new Error(`Failed to fetch categories: ${res.status} ${res.statusText}`);
         }
+        
         const data = await res.json();
-        console.log('Categories fetched successfully:', data.length);
-        setCategories(data);
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          throw new Error('Invalid category data format received from API');
+        }
       } catch (err) {
         console.error('Error fetching categories:', err);
+        setCategories([]);
       }
     };
 

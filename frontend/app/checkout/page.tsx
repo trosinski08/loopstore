@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getMediaUrl } from '@/lib/utils';
 
 interface FormData {
@@ -13,28 +16,63 @@ interface FormData {
   city: string;
   postalCode: string;
   country: string;
+  phone: string;
 }
 
 export default function CheckoutPage() {
-  const { cart } = useCart();
+  const { cart, cartTotal, checkout, isProcessingCheckout } = useCart();
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [orderError, setOrderError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
-    email: '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
     address: '',
     city: '',
     postalCode: '',
     country: '',
+    phone: '',
   });
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // If cart is empty, redirect to cart page
+  if (cart.length === 0) {
+    router.push('/cart');
+    return null;
+  }
+
   const shipping = 10; // Example shipping cost
-  const total = subtotal + shipping;
+  const total = cartTotal + shipping;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement order submission
-    console.log('Order submitted:', { formData, cart, total });
+    setOrderError(null);
+    
+    try {
+      // If user is not logged in, suggest to log in first
+      if (!isAuthenticated) {
+        const continueAsGuest = confirm(
+          'You are not logged in. Would you like to continue as a guest? (Click Cancel to log in first)'
+        );
+        
+        if (!continueAsGuest) {
+          router.push(`/login?redirect=${encodeURIComponent('/checkout')}`);
+          return;
+        }
+      }
+      
+      const result = await checkout(formData);
+      
+      if (result.success) {
+        // Redirect to order confirmation page
+        router.push(`/order-confirmation/${result.orderId}`);
+      } else {
+        setOrderError(result.error || 'There was a problem processing your order.');
+      }
+    } catch (err) {
+      setOrderError('An unexpected error occurred.');
+      console.error(err);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,6 +203,22 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            <div className="bg-white p-6 rounded-lg shadow-sm mt-6">
+              <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
+              {/* Payment gateway integration will go here */}
+              <div className="border border-gray-200 p-4 rounded-md text-center">
+                <p className="text-gray-500">Payment gateway integration is pending.</p>
+                <p className="text-sm text-gray-400">This is a placeholder for the payment processing step.</p>
+              </div>
+            </div>
+
+            {orderError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
+                <strong className="font-bold">Error: </strong>
+                <span className="block sm:inline">{orderError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               className="w-full btn btn-primary py-3"
@@ -207,7 +261,7 @@ export default function CheckoutPage() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>${cartTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
@@ -225,4 +279,4 @@ export default function CheckoutPage() {
       </div>
     </div>
   );
-} 
+}

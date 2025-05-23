@@ -3,7 +3,20 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { useFavorites } from '@/context/FavoritesContext';
+import { useAuth } from '@/context/AuthContext';
 import { getMediaUrl } from '@/lib/utils';
+import Reviews from '@/components/product/Reviews';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
+
+interface Review {
+  id: number;
+  user_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+}
 
 interface Product {
   id: number;
@@ -12,6 +25,7 @@ interface Product {
   price: number;
   stock: number;
   image: string;
+  reviews?: Review[];
 }
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -19,6 +33,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+  const [isInFavorites, setIsInFavorites] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -40,6 +57,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     fetchProduct();
   }, [params.id]);
 
+  useEffect(() => {
+    if (product) {
+      setIsInFavorites(isFavorite(product.id));
+    }
+  }, [product, isFavorite]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -55,7 +78,6 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
-
   const handleAddToCart = () => {
     if (product.stock > 0) {
       addToCart({ ...product, quantity: 1 });
@@ -65,7 +87,25 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       alert('Product is out of stock');
     }
   };
-
+  
+  const toggleFavorite = async () => {
+    if (!isAuthenticated) {
+      alert('Please log in to add items to your favorites');
+      return;
+    }
+    
+    if (isInFavorites) {
+      const success = await removeFromFavorites(product.id);
+      if (success) {
+        setIsInFavorites(false);
+      }
+    } else {
+      const success = await addToFavorites(product);
+      if (success) {
+        setIsInFavorites(true);
+      }
+    }
+  };
   return (
     <div className="container py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -82,8 +122,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <div>
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
           <p className="text-gray-600 mb-6">{product.description}</p>
-          
-          <div className="space-y-4">
+            <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-2xl font-bold">${product.price}</span>
               <span className={`px-3 py-1 rounded-full text-sm ${
@@ -92,17 +131,41 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
               </span>
             </div>
-
-            <button
-              onClick={handleAddToCart}
-              disabled={product.stock === 0}
-              className="w-full btn btn-primary py-3"
-            >
-              {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-            </button>
+            
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddToCart}
+                disabled={product.stock === 0}
+                className="flex-grow btn btn-primary py-3"
+              >
+                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+              </button>
+              
+              <button 
+                onClick={toggleFavorite}
+                className={`px-4 py-3 border rounded-md transition ${
+                  isInFavorites 
+                    ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' 
+                    : 'border-gray-200 hover:bg-gray-50'
+                }`}
+                aria-label={isInFavorites ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                {isInFavorites ? (
+                  <HeartIconSolid className="h-5 w-5" />
+                ) : (
+                  <HeartIconOutline className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Reviews Section */}
+      <Reviews 
+        productId={parseInt(params.id)} 
+        initialReviews={product.reviews || []} 
+      />
     </div>
   );
 } 

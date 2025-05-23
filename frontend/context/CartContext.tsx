@@ -1,7 +1,7 @@
-// filepath: frontend/context/CartContext.tsx
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import axios from "axios";
 
 interface Product {
   id: number;
@@ -24,6 +24,20 @@ interface CartContextType {
   updateQuantity: (id: number, quantity: number) => void;
   cartTotal: number;
   itemsCount: number;
+  checkout: (shippingDetails: ShippingDetails) => Promise<{ success: boolean; orderId?: number; error?: string }>;
+  isProcessingCheckout: boolean;
+}
+
+// Shipping details interface for checkout
+interface ShippingDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  phone?: string;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,6 +46,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartTotal, setCartTotal] = useState(0);
   const [itemsCount, setItemsCount] = useState(0);
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
 
   // Load cart from localStorage on initial render
   useEffect(() => {
@@ -85,7 +100,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const clearCart = () => {
     setCart([]);
   };
-
   const updateQuantity = (id: number, quantity: number) => {
     setCart((prevCart) => {
       const item = prevCart.find((item) => item.id === id);
@@ -100,10 +114,55 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return prevCart.filter((item) => item.id !== id);
       }
 
-      return prevCart.map((item) =>
+      return prevCart.map((item) => 
         item.id === id ? { ...item, cartQuantity: quantity } : item
       );
     });
+  };
+
+  const checkout = async (shippingDetails: ShippingDetails): Promise<{ success: boolean; orderId?: number; error?: string }> => {
+    setIsProcessingCheckout(true);
+    try {
+      const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api';
+      
+      // Create the order payload
+      const orderPayload = {
+        items: cart.map(item => ({
+          product_id: item.id,
+          quantity: item.cartQuantity,
+          price: item.price
+        })),
+        shipping_details: shippingDetails,
+        total: cartTotal
+      };
+      
+      // Send the order to the backend
+      const response = await axios.post(`${baseApiUrl}/orders/`, orderPayload, {
+        withCredentials: true
+      });
+      
+      if (response.status === 201) {
+        // Order created successfully
+        clearCart();
+        return { 
+          success: true, 
+          orderId: response.data.id 
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'Failed to create order' 
+        };
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+      };
+    } finally {
+      setIsProcessingCheckout(false);
+    }
   };
 
   return (
@@ -116,6 +175,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         updateQuantity,
         cartTotal,
         itemsCount,
+        checkout,
+        isProcessingCheckout
       }}
     >
       {children}

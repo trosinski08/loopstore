@@ -1,7 +1,7 @@
 # filepath: c:\Users\Tomek\source\loopstore\backend\shop\views.py
 from django.http import HttpResponse
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
@@ -16,6 +16,13 @@ from .serializers import (
 
 def home(request):
     return HttpResponse("Welcome to the Loopstore!")
+
+@api_view(['GET'])
+def health_check(request):
+    """
+    Health check endpoint for Docker container health monitoring
+    """
+    return Response({"status": "healthy"}, status=status.HTTP_200_OK)
 	
 class OrderView(APIView):
     def post(self, request):

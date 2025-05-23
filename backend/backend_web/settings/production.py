@@ -73,6 +73,21 @@ DATABASES = {
     }
 }
 
+# Redis settings
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
+
+# Cache settings
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_URL,
+    }
+}
+
+# Session settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
 # Additional security settings
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
@@ -81,4 +96,48 @@ PASSWORD_HASHERS = [
 ]
 
 # Rate limiting
-SECURE_REFERRER_POLICY = 'same-origin' 
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# Defender settings
+DEFENDER_REDIS_URL = REDIS_URL
+DEFENDER_STORE_ACCESS_ATTEMPTS = True
+DEFENDER_ACCESS_ATTEMPT_EXPIRATION = 24  # hours
+
+# Axes settings
+AXES_HANDLER = 'axes.handlers.cache.AxesCacheHandler'
+AXES_CACHE = 'default'
+AXES_COOLOFF_TIME = 1  # hours
+AXES_FAILURE_LIMIT = 5
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_LOCKOUT_TEMPLATE = 'lockout.html'
+
+# Logging settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/debug.log',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
+} 

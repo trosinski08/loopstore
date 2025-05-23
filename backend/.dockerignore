@@ -26,4 +26,27 @@ staticfiles/
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# SSL Certificates
+certs/
+
+# Tests
+tests/
+test_*.py
+*_test.py
+*_tests.py
+
+# Documentation
+docs/
+*.md
+LICENSE 

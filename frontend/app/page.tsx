@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { ArrowRight } from 'lucide-react';
 import { getMediaUrl } from "@/lib/utils";
+import Newsletter from "@/components/Newsletter";
 
 interface Product {
 	id: number;
@@ -26,7 +27,8 @@ export default function Home() {
 	useEffect(() => {
 		const fetchProducts = async () => {
 			try {
-				const res = await fetch("/api/products/");
+        const baseApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api';
+				const res = await fetch(`${baseApiUrl}/products/`);
 				if (!res.ok) {
 					throw new Error("Failed to fetch products");
 				}
@@ -150,30 +152,8 @@ export default function Home() {
 						</Link>
 					</div>
 				</div>
-			</section>
-
-			{/* Newsletter Section */}
-			<section className="py-16">
-				<div className="container">
-					<div className="max-w-2xl mx-auto text-center">
-						<h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2>
-						<p className="text-gray-600 mb-8">
-							Subscribe to our newsletter for exclusive offers and updates on new arrivals.
-						</p>
-						<form className="flex gap-4">
-							<input
-								type="email"
-								placeholder="Enter your email"
-								className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-								required
-							/>
-							<button type="submit" className="btn btn-primary px-8">
-								Subscribe
-							</button>
-						</form>
-					</div>
-				</div>
-			</section>
+			</section>			{/* Newsletter Section */}
+			<Newsletter />
 		</div>
 	);
 }

@@ -4,6 +4,14 @@ import { useCart } from '@/context/CartContext';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  parent: number | null;
+}
+
 interface Product {
   id: number;
   name: string;
@@ -11,7 +19,12 @@ interface Product {
   price: number;
   image: string;
   stock: number;
-  category: string;
+  category: Category;
+  quantity?: number;
+  slug: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ProductCardProps {
@@ -22,6 +35,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, showDescription = true }: ProductCardProps) {
   const { addToCart } = useCart();
   const [isWishListed, setIsWishListed] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,10 +47,11 @@ export default function ProductCard({ product, showDescription = true }: Product
       <div className="group bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02]">
         <div className="relative aspect-square">
           <Image
-            src={product.image || '/placeholder.jpg'}
+            src={imgError ? '/images/placeholder.jpg' : (product.image || '/images/placeholder.jpg')}
             alt={product.name}
             fill
             className="object-cover transition-transform group-hover:scale-105"
+            onError={() => setImgError(true)}
           />
           <button
             onClick={toggleWishlist}
@@ -55,7 +70,7 @@ export default function ProductCard({ product, showDescription = true }: Product
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-lg font-semibold">{product.name}</h3>
-            <span className="text-sm text-gray-500">{product.category}</span>
+            <span className="text-sm text-gray-500">{product.category.name}</span>
           </div>
           {showDescription && (
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
@@ -63,13 +78,13 @@ export default function ProductCard({ product, showDescription = true }: Product
             </p>
           )}
           <div className="flex justify-between items-center">
-            <span className="text-lg font-bold">${product.price}</span>
+            <span className="text-lg font-bold">${Number(product.price).toFixed(2)}</span>
             <button
               onClick={(e) => {
                 e.preventDefault();
-                addToCart(product);
+                addToCart({...product, quantity: 1});
               }}
-              className="btn btn-primary px-4 py-2"
+              className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
               disabled={product.stock === 0}
             >
               Add to Cart
@@ -79,4 +94,4 @@ export default function ProductCard({ product, showDescription = true }: Product
       </div>
     </Link>
   );
-} 
+}

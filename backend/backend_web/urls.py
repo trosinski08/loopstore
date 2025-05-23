@@ -23,10 +23,14 @@ from shop.views import (
     CategoryViewSet,
     ProductSizeViewSet,
     OrderViewSet,
-    home
+    home,
+    health_check
 )
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+from two_factor.views import LoginView
+from two_factor.urls import urlpatterns as tf_urls
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='product')
@@ -37,5 +41,22 @@ router.register(r'orders', OrderViewSet, basename='order')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/healthcheck/', health_check, name='health_check'),
     path('', home, name='home'),
+    
+    # Authentication URLs
+    path('accounts/login/', LoginView.as_view(), name='login'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('accounts/password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
+    path('accounts/password_change/done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
+    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+      # Two-factor authentication URLs
+    path('', include(tf_urls)),
+    
+    # Security monitoring URLs
+    path('defender/', include('defender.urls')),
+    # path('axes/', include('axes.urls')),  # axes nie dostarcza modułu urls
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

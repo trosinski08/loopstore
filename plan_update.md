@@ -1,139 +1,118 @@
-# LoopStore - Plan Projektu (Aktualizacja)
+# LoopStore - Plan Projektu (Zaktualizowany)
+
+Projekt LoopStore to implementacja sklepu internetowego z przypisanymi wymaganiami i technologiami. Poniżej znajdziesz szczegółowy plan, uwzględniający narzędzia, architekturę, etapy rozwoju oraz CI/CD, containerizację i monitoring.
+
+---
 
 ## 1. Narzędzia z GitHub Student Developer Pack
 
 ### Hosting i Deployment
-
-- **DigitalOcean** ($200 kredytu)
-  - Kubernetes cluster dla kontenerów
+- **DigitalOcean**  
+  - Kubernetes Cluster – dla skalowalnych kontenerów
   - Managed Database dla PostgreSQL
-  - Spaces dla przechowywania mediów (kompatybilne z S3)
-
-- **Microsoft Azure** ($100 kredytu)
+  - Spaces (S3) – przechowywanie mediów  
+- **Microsoft Azure**  
   - Azure Container Registry
-  - Azure CDN dla statycznych zasobów
+  - Azure CDN – dla statycznych zasobów
   - Backup i disaster recovery
 
 ### Monitoring i Wydajność
-
-- **DataDog** (2 lata Pro)
-  - Monitoring infrastruktury
-  - APM (Application Performance Monitoring)
-  - Log Management
-
-- **Sentry** (500k wydarzeń/miesiąc)
-  - Error tracking
-  - Performance monitoring
+- **DataDog** (2 lata Pro)  
+  - Monitoring infrastruktury i aplikacji (APM)
+  - Log Management  
+- **Sentry** (500k wydarzeń/miesiąc)  
+  - Śledzenie błędów i performance monitoring  
   - Release tracking
 
 ### Rozwój i Testowanie
-
-- **JetBrains** (pełna subskrypcja)
-  - PyCharm Professional dla backendu
-  - WebStorm dla frontendu
-  - DataGrip dla bazy danych
-
-- **GitHub Copilot**
-  - AI-assisted development
-  - Code suggestions
-  - Documentation help
+- **JetBrains IDEs** (PyCharm Professional, WebStorm, DataGrip)  
+  - Wydajne środowiska pracy dla backendu, frontendu i baz danych  
+- **GitHub Copilot**  
+  - Asystent AI przy generowaniu kodu  
+- **BrowserStack**  
+  - Testowanie na różnych urządzeniach i przeglądarkach  
 
 ### Design i UI/UX
-
-- **Figma** (Professional plan)
-  - UI/UX design
-  - Component library
-  - Design system
-
-- **Canva** (Pro subscription)
-  - Grafiki marketingowe
-  - Social media assets
-  - Bannery i promocje
+- **Figma** (Professional plan)  
+  - Kompleksowy design, systemy komponentów  
+- **Canva** (Pro subscription)  
+  - Grafiki marketingowe, banery, social media assets  
 
 ### Bezpieczeństwo
+- **Name.com / Namecheap**  
+  - Rejestracja domeny (.tech lub .me) z darmowym certyfikatem SSL  
+- **Auth0**  
+  - Uwierzytelnianie (OAuth2, Single Sign-On)
 
-- **Name.com** (darmowa domena .tech)
-  - SSL certificate
-  - Domain registration
-  - DNS management
-
-- **Auth0** (darmowe konto)
-  - Uwierzytelnianie
-  - OAuth2 integracje
-  - Single Sign-On
+---
 
 ## 2. Architektura Projektu
 
 ### Frontend (Next.js 14)
-
-```bash
-frontend/
-├── app/
-│   ├── (shop)/
-│   │   ├── page.tsx                 # Strona główna
-│   │   ├── products/
-│   │   │   ├── [slug]/page.tsx      # Szczegóły produktu
-│   │   │   └── page.tsx             # Lista produktów
-│   │   ├── cart/
-│   │   └── checkout/
-│   ├── (auth)/
-│   │   ├── login/
-│   │   └── register/
-│   └── (account)/
-│       ├── orders/
-│       └── settings/
-├── components/
-│   ├── ui/                          # Komponenty podstawowe
-│   │   ├── Button/
-│   │   ├── Input/
-│   │   └── Card/
-│   ├── shop/                        # Komponenty biznesowe
-│   │   ├── ProductCard/
-│   │   ├── CartWidget/
-│   │   └── CheckoutForm/
-│   └── layout/                      # Komponenty layoutu
-│       ├── Navbar/
-│       └── Footer/
-└── lib/
-    ├── api/                         # Integracja z API
-    ├── hooks/                       # Custom hooks
-    └── utils/                       # Narzędzia pomocnicze
-```
+- **Struktura katalogów:**
+  ```
+  frontend/
+  ├── app/
+  │   ├── (shop)/
+  │   │   ├── page.tsx                 # Strona główna z listą produktów
+  │   │   ├── products/
+  │   │   │   ├── [slug]/page.tsx       # Szczegóły produktu
+  │   │   │   └── page.tsx              # Lista produktów
+  │   │   ├── cart/                    # Koszyk
+  │   │   └── checkout/                # Formularz zamówienia
+  │   ├── (auth)/
+  │   │   ├── login/
+  │   │   └── register/
+  │   └── (account)/
+  │       ├── orders/
+  │       └── settings/
+  ├── components/
+  │   ├── ui/                          # Przykładowe komponenty (Button, Input, Card)
+  │   ├── shop/                        # Komponenty związane z produktami i koszykiem
+  │   └── layout/                      # Navbar, Footer, globalny layout
+  └── lib/
+      ├── api/                         # Integracja z API backendu
+      ├── hooks/                       # Custom hooks
+      └── utils/                       # Narzędzia pomocnicze (np. getMediaUrl)
+  ```
 
 ### Backend (Django 5.2)
+- **Struktura katalogów:**
+  ```
+  backend/
+  ├── apps/
+  │   ├── products/
+  │   │   ├── models.py
+  │   │   ├── views.py
+  │   │   ├── serializers.py
+  │   │   └── tests/
+  │   ├── orders/
+  │   │   ├── models.py
+  │   │   ├── views.py
+  │   │   └── services/
+  │   └── users/
+  │       ├── models.py
+  │       └── views.py
+  ├── core/
+  │   ├── settings/
+  │   │   ├── base.py
+  │   │   ├── development.py
+  │   │   └── production.py
+  │   └── urls.py
+  └── utils/
+      ├── storage.py                   # Integracja z DigitalOcean Spaces/S3
+      └── validators.py
+  ```
 
-```bash
-backend/
-├── apps/
-│   ├── products/
-│   │   ├── models.py
-│   │   ├── views.py
-│   │   ├── serializers.py
-│   │   └── tests/
-│   ├── orders/
-│   │   ├── models.py
-│   │   ├── views.py
-│   │   └── services/
-│   └── users/
-│       ├── models.py
-│       └── views.py
-├── core/
-│   ├── settings/
-│   │   ├── base.py
-│   │   ├── development.py
-│   │   └── production.py
-│   └── urls.py
-└── utils/
-    ├── storage.py
-    └── validators.py
-```
+---
 
-## 3. Konfiguracja Infrastruktury
+## 3. Konfiguracja Infrastruktury i Containerizacja
 
-### Docker
+### Docker & Docker Compose
+- **Frontend, Backend, DB, Redis, Nginx** w oddzielnych kontenerach
+- Przykładowy plik `docker-compose.yml` (wersja developerska / produkcyjna):
 
 ```yaml
-# docker-compose.yml
 version: '3.8'
 
 services:
@@ -141,25 +120,38 @@ services:
     build: ./frontend
     environment:
       - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost/api
+      - NEXT_PUBLIC_MEDIA_URL=http://localhost
     ports:
       - "3000:3000"
+    networks:
+      - loopstore_network
 
   backend:
     build: ./backend
     environment:
       - DJANGO_SETTINGS_MODULE=core.settings.development
+      - SECURE_SSL_REDIRECT=False
+      - SESSION_COOKIE_SECURE=False
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://frontend:3000
     ports:
       - "8000:8000"
+    networks:
+      - loopstore_network
 
   db:
     image: postgres:16-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - loopstore_network
 
   redis:
     image: redis:7-alpine
     volumes:
       - redis_data:/data
+    networks:
+      - loopstore_network
 
   nginx:
     image: nginx:alpine
@@ -167,125 +159,110 @@ services:
       - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - loopstore_network
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  loopstore_network:
 ```
+
+---
 
 ## 4. Funkcjonalności i Implementacja
 
 ### System Produktów
-
-- Kategorie i tagi
-- Warianty produktów (rozmiary, kolory)
-- System zarządzania stanem magazynowym
-- Wyszukiwanie i filtrowanie
+- Kategorie, tagi, warianty produktów (rozmiary, kolory)
+- Zarządzanie stanem magazynowym
+- Wyszukiwanie i filtrowanie (np. po cenie, kategorii)
 
 ### Koszyk i Zamówienia
-
-- Persystentny koszyk (Redis)
-- Proces checkout
-- Śledzenie statusu zamówienia
-- Historia zamówień
+- Koszyk persystowany w Redis (na potrzeby sesji)
+- Proces checkout z formularzem zbierającym dane klienta
+- Historia zamówień (model Order)
+- Endpointy API do składania i podglądu zamówień
 
 ### System Płatności
-
-- Stripe integration
-- PayPal (opcjonalnie)
-- Przelewy24 (dla rynku polskiego)
+- **Integracja Stripe**  
+  - Endpoint do tworzenia `PaymentIntent` w Django  
+  - Formularz płatności w Next.js wykorzystujący Stripe SDK
+- Opcjonalnie: PayPal lub lokalne rozwiązania (np. Przelewy24)
 
 ### Użytkownicy i Autoryzacja
+- Autoryzacja z Auth0 lub standardowy system Django (z rejestracją i profilami)
+- Role użytkowników, system logowania/rejestracji
+- Historia aktywności i zamówień
 
-- Auth0 dla uwierzytelniania
-- Role i uprawnienia
-- Profile użytkowników
-- Historia aktywności
+### SEO i Wydajność
+- Server-Side Rendering (Next.js) i optymalizacja stron
+- Meta tagi, Sitemap, robots.txt, Schema.org
+- Lazy loading obrazów, Code splitting, integracja z CDN
 
-## 5. Bezpieczeństwo
+---
 
-### Zabezpieczenia
+## 5. Plan Wdrożenia i Etapy Rozwoju
 
-- HTTPS (SSL/TLS)
-- CORS policy
-- Rate limiting
-- Input validation
-- XSS protection
-- CSRF tokens
-
-### Monitoring
-
-- DataDog APM
-- Sentry error tracking
-- Custom logging
-- Performance metrics
-
-## 6. SEO i Wydajność
-
-### SEO
-
-- Server-side rendering
-- Meta tagi
-- Sitemap.xml
-- robots.txt
-- Schema.org markup
-
-### Optymalizacja
-
-- Code splitting
-- Lazy loading
-- Image optimization
-- Caching strategies
-- CDN integration
-
-## 7. Plan Wdrożenia
-
-### Etap 1: Setup (Tydzień 1-2)
-
-- Konfiguracja środowiska
-- Podstawowa struktura projektu
-- CI/CD pipeline
+### Etap 1: Setup oraz CI/CD (Tydzień 1-2)
+- **Środowisko developerskie**:
+  - Konteneryzacja aplikacji (Docker, Docker Compose)
+  - Konfiguracja repozytorium Git (GitHub)
+  - Integracja z CI/CD (GitHub Actions, testy jednostkowe)
+- **Podstawowa struktura projektu**:
+  - Szkielet projektu Next.js i Django
+  - Konfiguracja bazy danych, routing API
 
 ### Etap 2: Core Features (Tydzień 3-6)
-
-- System produktów
-- Koszyk
-- Autoryzacja
-- Podstawowy UI
+- **Frontend**:
+  - Lista produktów, szczegóły produktu, koszyk i formularz checkout
+- **Backend**:
+  - Modele produktów i zamówień
+  - Endpointy REST API przy użyciu Django REST Framework
+- **Integracja**:
+  - Połączenie frontendu z backendem (pobieranie produktów, składanie zamówień)
 
 ### Etap 3: Enhanced Features (Tydzień 7-10)
+- **System płatności**:
+  - Integracja i testowanie Stripe (endpointy, formularze płatności)
+- **Autoryzacja i użytkownicy**:
+  - System rejestracji/logowania, profile użytkowników
+  - Wdrożenie Auth0, jeśli wymagane
+- **Panel administracyjny**:
+  - Rozbudowany panel zarządzania produktami i zamówieniami
 
-- System płatności
-- Zaawansowane filtrowanie
-- Profile użytkowników
-- Admin panel
+### Etap 4: Optymalizacja i Skalowalność (Tydzień 11-12)
+- **Wdrożenie hostingu**:
+  - Frontend na Netlify/Vercel
+  - Backend na Heroku lub DigitalOcean (konteneryzacja, Kubernetes)
+- **Monitoring**:
+  - DataDog, Sentry, logowanie
+- **SEO i optymalizacja**:
+  - Pełna konfiguracja SEO, integracja z CDN, optymalizacja kodu, cache
 
-### Etap 4: Optimization (Tydzień 11-12)
+---
 
-- SEO
-- Performance
-- Security
-- Testing
+## 6. Rozwój i Utrzymanie
 
-## 8. Rozwój i Utrzymanie
+### Monitoring i Backup
+- **Monitoring**: DataDog (APM, logi), Sentry (błędy, performance)
+- **Backup**: Regularne kopie bazy danych, media, konfiguracja
+- **Aktualizacje**: Patches bezpieczeństwa, dependency updates
 
-### Monitoring:/
+### CI/CD i Automatyzacja
+- **GitHub Actions**: Automatyczne testy, budowanie i wdrażanie
+- **Deployment Pipelines**: Oddzielne pipeline’y dla frontendu i backendu
 
-- DataDog dashboards
-- Error tracking
-- Performance metrics
-- User analytics
+---
 
-### Backup
+## 7. Dodatkowe Rozwiązania i Integracje
 
-- Database backups
-- Media files backup
-- Configuration backup
-- Disaster recovery plan
+- **Design i prototypowanie**: Figma + Canva – tworzenie profesjonalnego interfejsu
+- **Bezpieczeństwo**: Konfiguracja HTTPS, CORS, rate limiting, CSRF protection
+- **Integracje**: Płatności Stripe, Auth0, integracja z zewnętrznymi API
 
-### Updates
-
-- Security patches
-- Dependency updates
-- Feature updates
-- Performance improvements
+---

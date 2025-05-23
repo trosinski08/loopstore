@@ -1,12 +1,16 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { ShoppingCart, User, Menu } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { ShoppingCart, User, Menu, Search } from 'lucide-react';
 import { useState } from 'react';
+import SearchBar from './SearchBar';
 
 export default function Navbar() {
   const { cart } = useCart();
+  const { isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
 
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -25,9 +29,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold">
             LoopStore
-          </Link>
-
-          {/* Desktop Menu */}
+          </Link>          {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
             {menuItems.map((item) => (
               <Link
@@ -40,10 +42,23 @@ export default function Navbar() {
             ))}
           </div>
 
+          {/* Desktop Search */}
+          <div className="hidden md:block flex-1 mx-4 max-w-md">
+            <SearchBar />
+          </div>
+
           {/* User Actions */}
           <div className="flex items-center space-x-4">
+            {/* Mobile Search Toggle */}
             <button
-              onClick={() => router.push('/profile')}
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="md:hidden text-gray-600 hover:text-black"
+            >
+              <Search size={24} />
+            </button>
+
+            <button
+              onClick={() => router.push(isAuthenticated ? '/account' : '/login')}
               className="text-gray-600 hover:text-black"
             >
               <User size={24} />
@@ -68,9 +83,7 @@ export default function Navbar() {
               <Menu size={24} />
             </button>
           </div>
-        </div>
-
-        {/* Mobile Menu */}
+        </div>        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4">
             {menuItems.map((item) => (
@@ -83,6 +96,13 @@ export default function Navbar() {
                 {item.label}
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Mobile Search */}
+        {isSearchOpen && (
+          <div className="md:hidden py-4">
+            <SearchBar />
           </div>
         )}
       </div>

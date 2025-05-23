@@ -1,0 +1,27 @@
+{
+  "name": "loopstore",
+  "version": "1.0.0",
+  "description": "LoopStore e-commerce application",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "docker-compose -f docker-compose.dev.yml up",
+    "build": "docker-compose build",
+    "start": "docker-compose up",
+    "audit": "npm audit && npm audit --workspaces",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend"
+  },
+  "dependencies": {
+    "next": "^15.3.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

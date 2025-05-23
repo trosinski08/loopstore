@@ -1,29 +1,64 @@
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Set work directory
+# Ustaw katalog roboczy
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-        build-essential \
-        libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Zainstaluj zależności systemowe
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    netcat-openbsd \
+    curl \
+    git \
+    build-essential \
+    libpq-dev \
+    redis-tools \
+    --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Skopiuj plik requirements.txt
+COPY requirements.txt /app/
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+COPY entry.sh /usr/local/bin/entry.sh
+COPY dev-entrypoint.sh /usr/local/bin/dev-entrypoint.sh
 
-# Copy project
-COPY . .
+# Zainstaluj zależności i przygotuj środowisko deweloperskie
+RUN pip install --no-cache-dir -r requirements.txt && \
+    # Dodatkowe narzędzia deweloperskie
+    pip install --no-cache-dir \
+    django-debug-toolbar \
+    ipython \
+    pytest \
+    pytest-django \
+    safety \
+    black \
+    isort \
+    && safety check --full-report || true && \
+    chmod +x /usr/local/bin/wait-for-it.sh && \
+    chmod +x /usr/local/bin/entry.sh && \
+    chmod +x /usr/local/bin/dev-entrypoint.sh && \
+    mkdir -p /app/certs
 
-# Expose port
+# Konfiguracja wolumenów dla środowiska deweloperskiego
+VOLUME ["/app/media", "/app/static"]
+
+# Zmienne środowiskowe dla środowiska deweloperskiego
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DJANGO_SETTINGS_MODULE=backend_web.settings.development \
+    DJANGO_DEBUG=True
+
+# Ustaw domyślny punkt wejścia
+ENTRYPOINT ["/usr/local/bin/dev-entrypoint.sh"]
+
+# Dodanie healthcheck dla środowiska deweloperskiego
+# W Alpine używamy wget zamiast curl, który jest dostępny domyślnie
+HEALTHCHECK --interval=5s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget -q --spider http://localhost:8000/ || exit 1
+
+# Exposuj port deweloperski
 EXPOSE 8000
 
-# Start development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] 
+# Domyślna komenda (uruchomienie serwera Django w trybie deweloperskim)
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
