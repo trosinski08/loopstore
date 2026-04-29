@@ -1,9 +1,5 @@
-# filepath: c:\Users\Tomek\source\loopstore\backend\shop\serializers.py
-from requests import Response
-from scipy import stats
-from rest_framework import serializers # type: ignore
+from rest_framework import serializers
 from .models import Product, Category, Order, Tag
-from rest_framework.views import APIView # type: ignore
 import logging
 
 class CategorySerializer(serializers.ModelSerializer):
