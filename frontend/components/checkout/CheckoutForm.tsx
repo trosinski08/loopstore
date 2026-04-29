@@ -50,7 +50,7 @@ export default function CheckoutForm() {
         total_amount: total,
       };
 
-      const response = await axios.post('http://localhost:8000/api/orders/', orderData);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/`, orderData);
       
       if (response.status === 201) {
         clearCart();

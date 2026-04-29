@@ -45,7 +45,7 @@ export default function OrdersHistory() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/orders/');
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/`);
       setOrders(response.data);
     } catch (error) {
       setError('Nie udało się pobrać historii zamówień');

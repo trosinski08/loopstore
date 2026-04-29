@@ -30,7 +30,7 @@ export default function CartPage() {
 
   const handleCheckout = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/orders/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

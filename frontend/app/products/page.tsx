@@ -31,7 +31,7 @@ export default function ProductsPage() {
         const minPrice = searchParams?.get('minPrice')
         const maxPrice = searchParams?.get('maxPrice')
 
-        let url = 'http://localhost:8000/api/products/?'
+        let url = `${process.env.NEXT_PUBLIC_API_URL}/api/products/?`
         if (category) url += `category=${category}&`
         if (size) url += `size=${size}&`
         if (condition) url += `condition=${condition}&`
