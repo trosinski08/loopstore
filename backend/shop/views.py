@@ -1,4 +1,3 @@
-# filepath: c:\Users\Tomek\source\loopstore\backend\shop\views.py
 from rest_framework import viewsets, status, filters # type: ignore
 from rest_framework.decorators import action # type: ignore
 from rest_framework.response import Response # type: ignore
@@ -58,7 +57,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True)
         
-        # Filtrowanie po zakresie cen
         min_price = self.request.query_params.get('min_price', None)
         max_price = self.request.query_params.get('max_price', None)
         if min_price is not None:
@@ -66,12 +64,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         if max_price is not None:
             queryset = queryset.filter(price__lte=max_price)
 
-        # Filtrowanie po wielu kategoriach
         categories = self.request.query_params.getlist('categories', [])
         if categories:
             queryset = queryset.filter(category__slug__in=categories)
 
-        # Filtrowanie po wielu tagach
         tags = self.request.query_params.getlist('tags', [])
         if tags:
             queryset = queryset.filter(tags__slug__in=tags)
@@ -110,8 +106,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'total_amount']
 
     def perform_create(self, serializer):
-        order = serializer.save()
-        # Tu możemy dodać dodatkową logikę, np. wysłanie maila z potwierdzeniem
+        serializer.save()
 
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):

@@ -11,6 +11,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 develop-eggs/
@@ -53,9 +54,13 @@ npm-debug.log*
 
 # Node (if using npm for frontend)
 node_modules/
-package-lock.json
+**/node_modules/
 
 # Temporary files
 *.tmp
 action_plan_*.md
 plan.md
+
+.next
+
+ignore/

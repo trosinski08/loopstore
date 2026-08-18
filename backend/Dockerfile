@@ -1,7 +1,10 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Ustaw katalog roboczy
 WORKDIR /app
+
+# Zaktualizuj i uaktualnij pakiety bazowe, aby usunąć znane podatności z obrazu bazowego
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Skopiuj plik requirements.txt
 COPY requirements.txt /app/

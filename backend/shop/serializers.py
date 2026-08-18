@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Product, Category, Order, Tag
-import logging
 
 class CategorySerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(read_only=True)
@@ -42,7 +41,6 @@ class ProductDetailSerializer(ProductSerializer):
         fields = ProductSerializer.Meta.fields + ['created_at', 'updated_at', 'related_products']
 
     def get_related_products(self, obj):
-        # Pobierz produkty z tej samej kategorii
         related = Product.objects.filter(
             category=obj.category,
             is_active=True
@@ -89,8 +87,6 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         items = validated_data.pop('items')
         order = Order.objects.create(**validated_data)
-        
-        # Aktualizuj stan magazynowy
         for item in items:
             product = Product.objects.get(id=item['product_id'])
             product.stock -= item['quantity']
@@ -99,17 +95,3 @@ class OrderSerializer(serializers.ModelSerializer):
         order.items = items
         order.save()
         return order
-
-logger = logging.getLogger(__name__)
-
-class OrderView(APIView):
-	def post(self, request):
-		logger.info(f"Received order creation request: {request.data}")
-		serializer = OrderSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			logger.info(f"Order created: {serializer.data}")
-			return Response(serializer.data, status=stats.HTTP_201_CREATED)
-		else:
-			logger.error(f"Order creation failed: {serializer.errors}")
-			return Response(serializer.errors, status=stats.HTTP_400_BAD_REQUEST)
