@@ -36,8 +36,13 @@ MANIFEST
 *.sqlite3
 db.sqlite3
 /media/
+**/media/
 /staticfiles/
 /static/
+
+# Node — never belongs in Django backend
+backend/package-lock.json
+backend/package.json
 
 # IDE
 .vscode/
